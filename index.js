@@ -15,18 +15,12 @@ const ARProjectManagementApp = {
 
     // Add the 3D model
     this.model = new THREE.Object3D();
-    this.model.add(new THREE.Mesh(
-      new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-    ));
+    this.model.add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0x00ff00 })));
     this.scene.add(this.model);
 
     // Add the AR markers
     this.marker = new THREE.Object3D();
-    this.marker.add(new THREE.Mesh(
-      new THREE.BoxGeometry(0.5, 0.5, 0.5),
-      new THREE.MeshBasicMaterial({ color: 0xff0000 })
-    ));
+    this.marker.add(new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshBasicMaterial({ color: 0xff0000 })));
     this.scene.add(this.marker);
 
     // Create the renderer
@@ -34,12 +28,18 @@ const ARProjectManagementApp = {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
 
-    // Add the AR controls
-    this.controls = new THREE.ARControls(this.camera, this.renderer.domElement);
+    // Check if the browser supports AR
+    if (THREE.ARUtils.isARSupported()) {
+      // Add the AR controls
+      this.controls = new THREE.ARControls(this.camera, this.renderer.domElement);
 
-    // Add the AR marker tracking
-    this.markerTracking = new THREE.MarkerTracker();
-    this.markerTracking.addMarker(this.marker);
+      // Add the AR marker tracking
+      this.markerTracking = new THREE.MarkerTracker();
+      this.markerTracking.addMarker(this.marker);
+    } else {
+      // Add orbit controls for desktop
+      this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+    }
 
     // Add the task management system
     this.taskManagement = new TaskManagement();
@@ -68,28 +68,10 @@ const ARProjectManagementApp = {
     // Update the camera
     this.controls.update();
 
-    // Update the marker tracking
-    this.markerTracking.update();
+    // Update the marker tracking (only if supported by the browser)
+    if (this.markerTracking) {
+      this.markerTracking.update();
+    }
 
     // Update the task management system
-    this.taskManagement.update();
-
-    // Update the progress tracking system
-    this.progressTracking.update();
-
-    // Update the User Interaction system
-    this.userInteraction.update();
-
-    // Update the UI overlay
-    this.UI.update();
-
-    // Render the scene
-    this.renderer.render(this.scene, this.camera);
-  }
-};
-
-class Task {
-  constructor(taskName, taskDescription, taskPriority) {
-    this.taskName = taskName;
-    this.taskDescription = taskDescription;
-   
+    this.taskManagement.
